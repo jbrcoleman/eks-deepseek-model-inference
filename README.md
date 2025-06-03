@@ -86,6 +86,14 @@ echo -n "$HUGGING_FACE_HUB_TOKEN" | base64
 
 # Update the secret in ray-vllm-deepseek.yml and deploy
 kubectl apply -f vllm-ray-gpu-deepseek/ray-vllm-deepseek.yml
+
+#Setup port forwarding to test model locally
+kubectl -n rayserve-vllm port-forward svc/vllm-serve-svc 8000:8000
+
+# Test inference
+curl -X POST http://localhost:8000/v1/chat/completions \
+  -H "Content-Type: application/json" \
+  -d '{"model": "deepseek-ai/DeepSeek-R1-Distill-Llama-8B", "messages": [{"role": "user", "content": "Explain about DeepSeek model?"}], "stream": false}'
 ```
 
 ### 4. Deploy Open WebUI (Optional)
@@ -93,6 +101,23 @@ kubectl apply -f vllm-ray-gpu-deepseek/ray-vllm-deepseek.yml
 ```bash
 # Deploy the web interface for interacting with the model
 kubectl apply -f vllm-ray-gpu-deepseek/open-webui.yaml
+
+# Setup port forward to test locally
+kubectl -n open-webui port-forward svc/open-webui 8080:80
+```
+
+### 5. Cleanup
+```bash
+# Delete the RayCluster
+cd vllm-ray-gpu-deepseek
+
+kubectl delete -f open-webui.yaml
+
+kubectl delete -f ray-vllm-deepseek.yml
+
+# Delete Infra
+cd jark-stack/terraform/_LOCAL/ && chmod +x cleanup.sh
+./cleanup.sh
 ```
 
 ## 🛠️ Infrastructure Components
