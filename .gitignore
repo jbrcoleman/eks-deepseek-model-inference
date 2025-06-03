@@ -1,0 +1,13 @@
+# Terraform state files
+*.tfstate
+*.tfstate.*
+*.tfstate.backup
+.terraform/
+.terraform.lock.hcl
+
+# Specific folder
+ai-on-eks/
+
+# All folders named _LOCAL
+_LOCAL/
+**/_LOCAL/
